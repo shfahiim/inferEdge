@@ -137,6 +137,7 @@ data class Task(
 
 object BuiltInTaskId {
   const val LLM_CHAT = "llm_chat"
+  const val LLM_INFERENCE_SERVER = "llm_inference_server"
   const val LLM_PROMPT_LAB = "llm_prompt_lab"
   const val LLM_ASK_IMAGE = "llm_ask_image"
   const val LLM_ASK_AUDIO = "llm_ask_audio"

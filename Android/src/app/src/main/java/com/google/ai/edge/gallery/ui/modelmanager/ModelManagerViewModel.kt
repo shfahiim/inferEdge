@@ -169,6 +169,7 @@ private val PREDEFINED_LLM_TASK_ORDER =
     BuiltInTaskId.LLM_ASK_IMAGE,
     BuiltInTaskId.LLM_ASK_AUDIO,
     BuiltInTaskId.LLM_CHAT,
+    BuiltInTaskId.LLM_INFERENCE_SERVER,
     BuiltInTaskId.LLM_AGENT_CHAT,
     BuiltInTaskId.LLM_PROMPT_LAB,
     BuiltInTaskId.LLM_TINY_GARDEN,
@@ -888,6 +889,14 @@ constructor(
               model.configs = newConfigs
             }
           }
+
+          if (model.isLlm) {
+            curTasks.find { it.id == BuiltInTaskId.LLM_INFERENCE_SERVER }?.models?.let { models ->
+              if (models.none { it.name == model.name }) {
+                models.add(model)
+              }
+            }
+          }
         }
 
         // Find models from allowlist if a task's `modelNames` field is not empty.
@@ -1025,6 +1034,11 @@ constructor(
 
       // Add to task.
       tasks.get(key = BuiltInTaskId.LLM_CHAT)?.models?.add(model)
+      tasks.get(key = BuiltInTaskId.LLM_INFERENCE_SERVER)?.models?.let { models ->
+        if (models.none { it.name == model.name }) {
+          models.add(model)
+        }
+      }
       tasks.get(key = BuiltInTaskId.LLM_PROMPT_LAB)?.models?.add(model)
       tasks.get(key = BuiltInTaskId.LLM_AGENT_CHAT)?.models?.add(model)
       if (model.llmSupportImage) {
