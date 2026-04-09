@@ -6,11 +6,21 @@ const STORAGE_KEYS = {
   settings: "inferedge_settings",
 };
 
+const FALLBACK_BASE_URL = "https://poco.fahiim.me/v1";
+
+function resolveDefaultBaseUrl() {
+  const origin = window.location?.origin;
+  if (origin && origin !== "null") {
+    return `${origin}/api/v1`;
+  }
+  return FALLBACK_BASE_URL;
+}
+
 const DEFAULTS = {
-  baseUrl: "https://poco.fahiim.me/v1",
+  baseUrl: resolveDefaultBaseUrl(),
   defaultModel: "Qwen2.5-1.5B-Instruct",
   systemPrompt:
-    "You are a helpful AI assistant. Be concise, accurate, and friendly in your responses.",
+    "You are a helpful AI assistant, InferEdge, designed to run on mobile devices. Be concise, accurate, and friendly in your responses.",
   temperature: 0.7,
   maxTokens: 1024,
   topP: 0.9,
@@ -497,12 +507,16 @@ async function handleSubmit(event) {
   const model = dom.modelSelect.value.trim();
   const message = dom.messageInput.value.trim();
 
-  if (!apiKey || !baseUrl || !model || !message) {
-    setStatus("Fill in the API key, base URL, model, and message.");
+  if (!baseUrl || !model || !message) {
+    setStatus("Fill in the base URL, model, and message.");
     return;
   }
 
-  window.localStorage.setItem(STORAGE_KEYS.apiKey, apiKey);
+  if (apiKey) {
+    window.localStorage.setItem(STORAGE_KEYS.apiKey, apiKey);
+  } else {
+    window.localStorage.removeItem(STORAGE_KEYS.apiKey);
+  }
   persistSettings();
   addModel(model, { silent: true });
 
@@ -536,12 +550,17 @@ async function handleSubmit(event) {
       top_p: Number(dom.topP.value),
     };
 
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    if (apiKey) {
+      headers.Authorization = `Bearer ${apiKey}`;
+    }
+
     const response = await fetch(`${baseUrl}/chat/completions`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
+      headers,
       body: JSON.stringify(payload),
     });
 
