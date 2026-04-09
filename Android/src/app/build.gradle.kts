@@ -122,6 +122,13 @@ dependencies {
 }
 
 protobuf {
-  protoc { path = "protoc" }
+  protoc {
+    val localProtocPath = providers.environmentVariable("PROTOC_PATH").orNull
+    if (!localProtocPath.isNullOrBlank()) {
+      path = localProtocPath
+    } else {
+      artifact = "com.google.protobuf:protoc:4.26.1"
+    }
+  }
   generateProtoTasks { all().forEach { it.plugins { create("java") { option("lite") } } } }
 }
