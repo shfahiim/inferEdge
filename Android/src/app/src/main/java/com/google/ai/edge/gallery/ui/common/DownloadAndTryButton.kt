@@ -144,6 +144,7 @@ fun DownloadAndTryButton(
   var showErrorDialog by remember { mutableStateOf(false) }
   var showMemoryWarning by remember { mutableStateOf(false) }
   var showGemmaTermsOfUseDialog by remember { mutableStateOf(false) }
+  var showTokenSetupDialog by remember { mutableStateOf(false) }
   var downloadStarted by remember { mutableStateOf(false) }
   val sheetState = rememberModalBottomSheetState()
 
@@ -288,6 +289,16 @@ fun DownloadAndTryButton(
             // If token is not stored or expired, log in and request a new token.
             TokenStatus.NOT_STORED,
             TokenStatus.EXPIRED -> {
+              // Check if token is not stored - show setup dialog
+              if (tokenStatusAndData.status == TokenStatus.NOT_STORED) {
+                Log.d(TAG, "No token found. Showing setup dialog.")
+                withContext(Dispatchers.Main) {
+                  showTokenSetupDialog = true
+                  checkingToken = false
+                  downloadStarted = false
+                }
+                return@launch
+              }
               withContext(Dispatchers.Main) { startTokenExchange() }
             }
 
@@ -584,6 +595,41 @@ fun DownloadAndTryButton(
         checkMemoryAndClickDownloadButton()
       },
       onCancel = { showGemmaTermsOfUseDialog = false },
+    )
+  }
+
+  if (showTokenSetupDialog) {
+    AlertDialog(
+      onDismissRequest = {
+        showTokenSetupDialog = false
+        downloadStarted = false
+      },
+      title = { Text("Authentication Required") },
+      text = {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+          Text("Some models require HuggingFace authentication.")
+          Text(
+            "To download:",
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Medium),
+            modifier = Modifier.padding(top = 8.dp)
+          )
+          Text("1. Open menu (☰) → Settings")
+          Text("2. Enter your HuggingFace access token")
+          Text("3. Get token from:")
+          ClickableLink(
+            text = "huggingface.co/settings/tokens",
+            url = "https://huggingface.co/settings/tokens"
+          )
+        }
+      },
+      confirmButton = {
+        TextButton(onClick = {
+          showTokenSetupDialog = false
+          downloadStarted = false
+        }) {
+          Text("OK")
+        }
+      }
     )
   }
 }
