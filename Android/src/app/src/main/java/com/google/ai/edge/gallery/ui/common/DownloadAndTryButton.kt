@@ -617,8 +617,8 @@ fun DownloadAndTryButton(
           Text("2. Enter your HuggingFace access token")
           Text("3. Get token from:")
           ClickableLink(
-            text = "huggingface.co/settings/tokens",
-            url = "https://huggingface.co/settings/tokens"
+            url = "https://huggingface.co/settings/tokens",
+            linkText = "huggingface.co/settings/tokens",
           )
         }
       },

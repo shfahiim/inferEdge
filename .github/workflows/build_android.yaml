@@ -8,17 +8,6 @@ on:
       - 'Android/**'
       - 'model_allowlists/**'
       - '.github/workflows/build_android.yaml'
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'skills/**'
-      - 'chat/**'
-      - 'README*'
-      - 'LICENSE'
-      - '*_Guide.md'
-      - 'plan.md'
-      - 'instruction.md'
-      - 'hardware.md'
   workflow_dispatch:
 
 permissions:

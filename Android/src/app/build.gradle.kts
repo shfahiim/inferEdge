@@ -67,6 +67,12 @@ android {
     compose = true
     buildConfig = true
   }
+
+  lint {
+    // Work around a known lint crash (IncompatibleClassChangeError) in
+    // androidx.lifecycle.lint.NonNullableMutableLiveDataDetector.
+    disable += "NullSafeMutableLiveData"
+  }
 }
 
 dependencies {
